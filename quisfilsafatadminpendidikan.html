@@ -1,1 +1,1194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Super Admin Ed - Filsafat Administrasi Pendidikan S2</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter & Fredoka for Clay Vibe -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
+    <style>
+        * {
+            font-family: 'Fredoka', 'Inter', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        /* Claymorphism Styling Engine */
+        .clay-card {
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 
+                8px 12px 20px rgba(0, 0, 0, 0.08),
+                inset -6px -6px 12px rgba(0, 0, 0, 0.05),
+                inset 6px 6px 12px rgba(255, 255, 255, 0.9);
+            border: 4px solid #F1F5F9;
+        }
+
+        .clay-btn {
+            border-radius: 24px;
+            transition: all 0.15s ease-in-out;
+            box-shadow: 
+                0px 8px 0px rgba(0, 0, 0, 0.2),
+                inset 3px 3px 6px rgba(255, 255, 255, 0.6),
+                inset -3px -3px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .clay-btn:active {
+            transform: translateY(6px);
+            box-shadow: 
+                0px 2px 0px rgba(0, 0, 0, 0.2),
+                inset 3px 3px 6px rgba(255, 255, 255, 0.6),
+                inset -3px -3px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .clay-btn-red {
+            background: linear-gradient(145deg, #FF595E, #E63946);
+            color: white;
+            border: 3px solid #FF8085;
+        }
+
+        .clay-btn-green {
+            background: linear-gradient(145deg, #2A9D8F, #197268);
+            color: white;
+            border: 3px solid #48CAE4;
+        }
+
+        .clay-btn-yellow {
+            background: linear-gradient(145deg, #FFB703, #FB8500);
+            color: white;
+            border: 3px solid #FFE066;
+        }
+
+        .clay-btn-blue {
+            background: linear-gradient(145deg, #4EA8DE, #0077B6);
+            color: white;
+            border: 3px solid #90E0EF;
+        }
+
+        .clay-box-question {
+            background: linear-gradient(145deg, #FFD166, #F4A261);
+            border: 4px solid #FFF3B0;
+            box-shadow: 
+                6px 8px 15px rgba(244, 162, 97, 0.4),
+                inset -4px -4px 8px rgba(0, 0, 0, 0.15),
+                inset 4px 4px 8px rgba(255, 255, 255, 0.8);
+        }
+
+        /* Custom Scrollbar for Modal */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F1F5F9;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 10px;
+        }
+
+        /* Canvas Screen styling */
+        #gameCanvas {
+            background: linear-gradient(to bottom, #70d6ff 0%, #e8c5ff 60%, #ffddd2 100%);
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+        /* Floating Animation */
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-float {
+            animation: floatSlow 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col justify-between p-2 md:p-4">
+
+    <!-- Top Navigation Header -->
+    <header class="max-w-6xl w-full mx-auto clay-card p-3 md:p-4 mb-3 flex justify-between items-center z-10">
+        <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-red-500 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-md border-2 border-red-300">
+                <i class="fa-solid font-bold">M</i>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg md:text-xl text-slate-800 leading-tight">SUPER ADMIN ED</h1>
+                <p class="text-xs text-slate-500 font-semibold">Filsafat Administrasi Pendidikan S2</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <!-- Score & Level Badge -->
+            <div class="hidden sm:flex items-center gap-2 bg-yellow-100 border-2 border-yellow-300 px-3 py-1.5 rounded-2xl">
+                <i class="fa-solid fa-coins text-yellow-600 text-lg animate-bounce"></i>
+                <span class="font-bold text-yellow-800 text-sm">Skor: <span id="displayScore">0</span></span>
+            </div>
+            <div class="flex items-center gap-2 bg-blue-100 border-2 border-blue-300 px-3 py-1.5 rounded-2xl">
+                <i class="fa-solid fa-cubes-stacked text-blue-600 text-lg"></i>
+                <span class="font-bold text-blue-800 text-sm">Blok HOTS: <span id="displayProgress">0/10</span></span>
+            </div>
+            <!-- Audio Toggle Button -->
+            <button id="audioToggleBtn" onclick="toggleAudio()" class="w-10 h-10 clay-btn clay-btn-yellow flex items-center justify-center rounded-2xl">
+                <i id="audioIcon" class="fa-solid fa-volume-high"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-6xl w-full mx-auto flex-1 flex flex-col justify-center items-center relative">
+
+        <!-- SCREEN 1: MAIN MENU / START SCREEN -->
+        <div id="startScreen" class="w-full clay-card p-6 md:p-10 text-center max-w-2xl animate-float my-auto">
+            <div class="inline-block p-4 bg-red-100 rounded-full text-red-500 text-5xl mb-4 shadow-inner">
+                <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <h2 class="text-2xl md:text-4xl font-extrabold text-slate-800 mb-2">Petualangan Filsafat Administrasi Pendidikan</h2>
+            <p class="text-slate-600 text-sm md:text-base mb-6">
+                Eksplorasi 10 Dunia Filosofis Kepemimpinan & Manajemen Pendidikan Magister! Pecahkan Tantangan Kuis HOTS (*High Order Thinking Skills*) untuk Meraih Gelar Master Filsafat Admin.
+            </p>
+
+            <!-- Student Data Inputs -->
+            <div class="space-y-3 mb-6 text-left max-w-md mx-auto">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nama Mahasiswa Magister:</label>
+                    <input type="text" id="playerNameInput" placeholder="Contoh: Budi Santoso, S.Pd." class="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-blue-400 focus:outline-none font-semibold text-slate-700">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">NIM / Instansi Universitas:</label>
+                    <input type="text" id="playerNimInput" placeholder="Contoh: 230102001 - Univ. Pendidikan" class="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-blue-400 focus:outline-none font-semibold text-slate-700">
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button onclick="startGame()" class="clay-btn clay-btn-green px-8 py-4 text-lg font-bold flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-play"></i> Mulai Petualangan
+                </button>
+                <button onclick="openInstructionsModal()" class="clay-btn clay-btn-blue px-6 py-4 text-lg font-bold flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-circle-info"></i> Panduan Gim
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: GAMEPLAY PLATFORMER CANVAS -->
+        <div id="gameScreen" class="w-full hidden flex-col items-center">
+            <!-- Canvas Container -->
+            <div class="relative w-full max-w-5xl overflow-hidden rounded-3xl">
+                <canvas id="gameCanvas" width="900" height="450" class="w-full h-auto border-4 border-white"></canvas>
+                
+                <!-- On-Screen Instructions overlay -->
+                <div class="absolute top-3 left-3 bg-white/80 backdrop-blur px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 pointer-events-none shadow">
+                    <i class="fa-solid fa-keyboard mr-1"></i> Kontrol: Panah / WASD / Tombol Sentuh Layar
+                </div>
+            </div>
+
+            <!-- Touch Controls for Mobile / Tablet -->
+            <div class="w-full max-w-5xl flex justify-between items-center mt-3 px-2">
+                <div class="flex gap-2">
+                    <button id="btnLeft" class="clay-btn clay-btn-blue w-14 h-14 text-2xl flex items-center justify-center rounded-2xl active:bg-blue-600">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <button id="btnRight" class="clay-btn clay-btn-blue w-14 h-14 text-2xl flex items-center justify-center rounded-2xl active:bg-blue-600">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+                <div class="text-center hidden md:block">
+                    <span class="text-xs text-slate-500 font-semibold bg-white px-4 py-2 rounded-2xl shadow">Seruduk Blok Tanda Tanya (?) Untuk Membuka Soal Kuis Filsafat</span>
+                </div>
+                <div>
+                    <button id="btnJump" class="clay-btn clay-btn-red px-6 h-14 text-lg font-bold flex items-center justify-center gap-2 rounded-2xl">
+                        <i class="fa-solid fa-arrow-up"></i> LOMPAT
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: RESULT & CERTIFICATE SCREEN -->
+        <div id="resultScreen" class="w-full clay-card p-6 md:p-8 text-center max-w-3xl hidden my-auto">
+            <div class="p-4 bg-yellow-100 rounded-full text-yellow-600 text-5xl inline-block mb-3 shadow-inner">
+                <i class="fa-solid fa-award"></i>
+            </div>
+            <h2 class="text-3xl font-extrabold text-slate-800">Transkrip & Evaluasi Filsafat</h2>
+            <p class="text-slate-500 text-sm mb-4">Hasil Analisis Kemampuan Berpikir Filosofis Administrasi Pendidikan S2</p>
+
+            <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl p-4 text-left mb-6 space-y-2">
+                <div class="flex justify-between border-b pb-2">
+                    <span class="text-slate-600 font-semibold">Nama Mahasiswa:</span>
+                    <span id="resName" class="font-bold text-slate-800">-</span>
+                </div>
+                <div class="flex justify-between border-b pb-2">
+                    <span class="text-slate-600 font-semibold">NIM / Universitas:</span>
+                    <span id="resNim" class="font-bold text-slate-800">-</span>
+                </div>
+                <div class="flex justify-between border-b pb-2">
+                    <span class="text-slate-600 font-semibold">Skor Akhir Kuis HOTS:</span>
+                    <span id="resScore" class="font-bold text-green-600 text-lg">0 / 100</span>
+                </div>
+                <div class="flex justify-between border-b pb-2">
+                    <span class="text-slate-600 font-semibold">Predikat Filosofis:</span>
+                    <span id="resPredicate" class="font-bold text-blue-600">-</span>
+                </div>
+                <div>
+                    <span class="text-slate-600 font-semibold block mb-1">Catatan Evaluasi Filosofis:</span>
+                    <p id="resEvaluation" class="text-xs text-slate-600 leading-relaxed italic bg-white p-3 rounded-xl border border-slate-200">
+                        -
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                <button onclick="restartGame()" class="clay-btn clay-btn-green px-6 py-3 font-bold flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i> Main Lagi
+                </button>
+                <button onclick="window.print()" class="clay-btn clay-btn-blue px-6 py-3 font-bold flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-print"></i> Cetak Transkrip
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="max-w-6xl w-full mx-auto text-center py-2 text-xs text-slate-500 font-medium">
+        Program Magister Administrasi Pendidikan &copy; 2026 - Gim Edukasi Filsafat 3D Clay
+    </footer>
+
+    <!-- MODAL 1: HOTS QUIZ MODAL (COMPLEX MULTIPLE CHOICE) -->
+    <div id="quizModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+        <div class="clay-card max-w-2xl w-full max-h-[90vh] overflow-y-auto p-5 md:p-7 relative animate-float" style="animation-duration: 4s;">
+            <!-- Quiz Header -->
+            <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-200">
+                <div class="flex items-center gap-2">
+                    <span id="modalTopicBadge" class="bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase">Dunia 1</span>
+                    <h3 id="modalTopicTitle" class="font-bold text-slate-800 text-sm md:text-base">Ontologi & Epistemologi</h3>
+                </div>
+                <span class="text-xs font-semibold bg-yellow-100 text-yellow-800 px-2.5 py-1 rounded-xl">
+                    <i class="fa-solid fa-square-check mr-1"></i> Pilihan Ganda Kompleks
+                </span>
+            </div>
+
+            <!-- HOTS Scenario Box -->
+            <div class="bg-blue-50/80 border-2 border-blue-200 rounded-2xl p-4 mb-4 text-xs md:text-sm text-slate-700 leading-relaxed shadow-inner">
+                <span class="font-bold text-blue-900 block mb-1"><i class="fa-solid fa-book-open mr-1"></i> Studi Kasus Filosofis (HOTS):</span>
+                <p id="modalScenarioText">...</p>
+            </div>
+
+            <p class="text-xs font-bold text-slate-500 uppercase mb-2">Pilihlah SEMUA pernyataan yang BENAR (Bisa lebih dari 1):</p>
+
+            <!-- Quiz Options (Checkboxes) -->
+            <div id="modalOptionsContainer" class="space-y-2.5 mb-5">
+                <!-- Dynamically Inserted Options -->
+            </div>
+
+            <!-- Quiz Feedback Box -->
+            <div id="quizFeedbackBox" class="hidden rounded-2xl p-4 mb-4 text-xs md:text-sm leading-relaxed border-2">
+                <h4 id="feedbackTitle" class="font-bold mb-1"></h4>
+                <p id="feedbackText" class="text-slate-700"></p>
+            </div>
+
+            <!-- Quiz Footer Action Buttons -->
+            <div class="flex justify-between items-center pt-2">
+                <span class="text-xs text-slate-400 font-medium">Pilih opsi dengan cermat</span>
+                <button id="btnSubmitAnswer" onclick="submitAnswer()" class="clay-btn clay-btn-green px-6 py-2.5 font-bold text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i> Kirim Jawaban
+                </button>
+                <button id="btnContinueGame" onclick="closeQuizModal()" class="clay-btn clay-btn-blue px-6 py-2.5 font-bold text-sm hidden flex items-center gap-2">
+                    Lanjut Petualangan <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: INSTRUCTIONS MODAL -->
+    <div id="instructionsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+        <div class="clay-card max-w-lg w-full p-6 relative">
+            <h3 class="text-xl font-bold text-slate-800 mb-3 flex items-center gap-2">
+                <i class="fa-solid fa-gamepad text-blue-500"></i> Petunjuk Permainan
+            </h3>
+            <div class="space-y-3 text-xs md:text-sm text-slate-600 mb-5">
+                <p class="flex items-start gap-2">
+                    <span class="bg-red-500 text-white font-bold px-2 py-0.5 rounded-lg text-xs">1</span>
+                    Kendalikan Karakter 3D Clay Mario menggunakan tombol Panah / WASD / Tombol sentuh layar.
+                </p>
+                <p class="flex items-start gap-2">
+                    <span class="bg-yellow-500 text-white font-bold px-2 py-0.5 rounded-lg text-xs">2</span>
+                    Lompat dan seruduk <strong>Blok Tanda Tanya (?)</strong> untuk memicu Studi Kasus Kuis Filsafat.
+                </p>
+                <p class="flex items-start gap-2">
+                    <span class="bg-green-500 text-white font-bold px-2 py-0.5 rounded-lg text-xs">3</span>
+                    Kuis menggunakan sistem **Pilihan Ganda Kompleks**. Centang semua opsi yang menurut Anda tepat secara teoritis.
+                </p>
+                <p class="flex items-start gap-2">
+                    <span class="bg-blue-500 text-white font-bold px-2 py-0.5 rounded-lg text-xs">4</span>
+                    Selesaikan seluruh 10 Blok Kasus hingga Garis Finish untuk mengunduh Transkrip & Evaluasi Magister Anda!
+                </p>
+            </div>
+            <button onclick="closeInstructionsModal()" class="clay-btn clay-btn-blue w-full py-2.5 font-bold">
+                Mengerti & Kembali
+            </button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT GAME ENGINE -->
+    <script>
+        /* -------------------------------------------------------------------------- */
+        /* 1. DATA KUIS HOTS FILSAFAT ADMINISTRASI PENDIDIKAN (10 SOAL COMPLEX)       */
+        /* -------------------------------------------------------------------------- */
+        const quizData = [
+            {
+                topic: "Ontologi & Epistemologi Administrasi Pendidikan",
+                title: "Paradigma Positivisme vs Konstruktivisme",
+                scenario: "Dinas Pendidikan menetapkan sistem pengawasan sekolah mutlak berbasis instrumen statistik kuantitatif kuantitatif (positivisme). Namun, para kepala sekolah mengeluh karena indikator tersebut gagal menangkap dinamika pemaknaan budaya dan karakter kearifan lokal sekolah.",
+                options: [
+                    { text: "Pendekatan kebijakan dinas berakar pada Ontologi Positivisme yang menganggap realitas administratif bersifat tunggal, objektif, dan terukur secara independen.", correct: true },
+                    { text: "Kritik para kepala sekolah mencerminkan Epistemologi Konstruktivisme yang meyakini bahwa efektivitas organisasi dibentuk oleh konstruksi sosial dan konteks lokal.", correct: true },
+                    { text: "Epistemologi Positivisme menuntut agar validitas manajemen sekolah hanya dinilai dari pengalaman subjektif individu guru.", correct: false },
+                    { text: "Integrasi paradigma (Mixed-Methods Epistemology) diperlukan agar administrasi bernilai rasional-objektif sekaligus responsif-kontekstual.", correct: true }
+                ],
+                explanation: "Positivisme menekankan kebenaran objektif terukur, sedangkan Konstruktivisme menekankan pemaknaan konteks sosial. Sintesis keduanya menciptakan analisis administrasi pendidikan yang komprehensif."
+            },
+            {
+                topic: "Aksiologi & Etika Kepemimpinan",
+                topicTitle: "Dilema Utilitarianisme vs Deontologi Kantian",
+                scenario: "Seorang Kepala Dinas Pendidikan memiliki dana sisa APBD terbatas. Pilihan A: Mengalokasikan dana ke 5% sekolah unggulan untuk menjamin medali emas olimpiade sains (utilitas hasil). Pilihan B: Membagi rata dana ke 95% sekolah terbelakang demi memenuhi keadilan dasar (kewajiban moral).",
+                options: [
+                    { text: "Pilihan A berorientasi pada Etika Utilitarianisme (Bentham/Mill), memaksimalkan dampak kemanfaatan terbesar bagi reputasi daerah.", correct: true },
+                    { text: "Pilihan B berlandaskan Etika Deontologi (Immanuel Kant), menekankan kewajiban moral atas keadilan hak dasar pendidikan tanpa memandang hasil akhir semata.", correct: true },
+                    { text: "Utilitarianisme menyatakan bahwa tindakan administratif dinilai baik hanya jika mematuhi hukum tanpa peduli konsekuensinya.", correct: false },
+                    { text: "Kepemimpinan bermartabat aksiologis tinggi harus mampu menyeimbangkan etika konsekuensi (utility) dan etika kewajiban (duty).", correct: true }
+                ],
+                explanation: "Utilitarianisme mengukur etika dari kemanfaatan/hasil (consequences), sedangkan Deontologi Kantian mendasarkan etika pada kewajiban moral murni (duty) dan penghormatan hak individu."
+            },
+            {
+                topic: "Pragmatisme John Dewey",
+                topicTitle: "Experiential Learning & Democratic Leadership",
+                scenario: "Sebuah program Studi Magister Administrasi Pendidikan mengubah kurikulumnya dari ceramah teoritis menjadi partisipasi aktif mahasiswa dalam memecahkan masalah birokrasi nyata di sekolah-sekolah marjinal.",
+                options: [
+                    { text: "Inovasi kurikulum ini merupakan aplikasi Pragmatisme John Dewey (Instrumentalisme), di mana ide administratif diuji kebenarannya melalui aksi praktis.", correct: true },
+                    { text: "Pendekatan ini mengembangkan Democratic School Leadership karena keputusan manajemen dibuat berdasarkan refleksi pengalaman bersama.", correct: true },
+                    { text: "Filsafat Pragmatisme menolak keterlibatan pengalaman langsung dalam proses pembelajaran administrasi.", correct: false },
+                    { text: "Experiential Learning memosisikan administrator bukan sebagai penguasa hirarki, melainkan fasilitator rekonstruksi pengalaman.", correct: true }
+                ],
+                explanation: "Pragmatisme Dewey menekankan bahwa kebenaran teori administratif terbukti dalam efektivitas praktis melalui pengalaman nyata dan demokratisasi pendidikan."
+            },
+            {
+                topic: "Teori Kritis (Habermas & Freire)",
+                topicTitle: "Komunikasi Bebas Dominasi & Dekonstruksi Birokrasi",
+                scenario: "Rapat dewan guru di sekolah kerap kali bersifat instruktif top-down. Kepala sekolah mendominasi percakapan dan kritik guru dianggap sebagai bentuk pembangkangan birokrasi.",
+                options: [
+                    { text: "Fenomena ini mencerminkan dominasi Rasionalitas Instrumental (Jürgen Habermas) yang mereduksi pendidik menjadi sekadar alat eksekusi teknis.", correct: true },
+                    { text: "Habermas menawarkan solusi berupa Tindakan Komunikatif (Communicative Action) melalui ruang publik sekolah yang bebas dari ketimpangan kekuasaan.", correct: true },
+                    { text: "Perspektif Paulo Freire menganggap birokrasi top-down sebagai 'Banking Concept' yang mendomestikasi kesadaran kritis guru.", correct: true },
+                    { text: "Teori Kritis menyarankan agar struktur hirarki otoriter dipertahankan demi menjaga kepatuhan mutlak bawahan.", correct: false }
+                ],
+                explanation: "Teori Kritis Habermas dan Freire mengkritik otoritarianisme birokrasi serta memperjuangkan dialog komunikatif emansipatoris tanpa dominasi kekuasaan."
+            },
+            {
+                topic: "Postmodernisme & Dekonstruksi",
+                topicTitle: "Kritik Teknokrasi & Standardisasi Pendidikan",
+                scenario: "Pemerintah menerapkan indikator kualifikasi tunggal yang seragam untuk seluruh sekolah di tanah air. Sekolah di daerah pedalaman yang berfokus pada kearifan lokal dianggap gagal karena tidak memenuhi standar teknokratis kota.",
+                options: [
+                    { text: "Postmodernisme (Jean-François Lyotard) mengkritik standardisasi tunggal ini sebagai 'Grand Narrative' (Narasi Besar) yang menindas keberagaman.", correct: true },
+                    { text: "Dekonstruksi Derrida mendorong pembongkaran hierarki oposisi biner seperti 'Sekolah Standard / Maju vs Tidak Standard / Tertinggal'.", correct: true },
+                    { text: "Postmodernisme memperjuangkan agar seluruh tata kelola pendidikan diserahkan pada satu otoritas sentralistik yang rigid.", correct: false },
+                    { text: "Pendekatan Postmodern menuntut Tata Kelola Pluralistik (Decentralized Governance) yang menghargai keunikan lokalitas tiap lembaga.", correct: true }
+                ],
+                explanation: "Postmodernisme membedah dan menolak standarisasi universal tunggal (Grand Narratives), serta menekankan keberagaman konteks (Micro-narratives) dalam administrasi."
+            },
+            {
+                topic: "Fenomenologi & Hermeneutika",
+                topicTitle: "Supervisi Akademik Reflektif",
+                scenario: "Seorang supervisor sekolah tidak menggunakan checklist centang kuantitatif baku saat mendampingi guru, melainkan berdialog mendalam untuk memahami dinamika batiniah dan pemaknaan mengajar guru tersebut.",
+                options: [
+                    { text: "Pendekatan supervisi ini berakar pada Fenomenologi yang berfokus pada 'Lived Experience' (pengalaman hidup subjektif) guru.", correct: true },
+                    { text: "Hermeneutika (Gadamer) diterapkan ketika supervisor dan guru melakukan peleburan cakrawala pemahaman (Horizontverschmelzung).", correct: true },
+                    { text: "Fenomenologi menuntut agar perasaan dan persepsi emosional guru dihapuskan dalam evaluasi supervisi.", correct: false },
+                    { text: "Model ini mengubah supervisi dari hubungan Inspeksi Subjek-Objek menjadi Kemitraan Reflektif Subjek-Subjek.", correct: true }
+                ],
+                explanation: "Fenomenologi dan Hermeneutika menggeser pengawasan formalistik menjadi interpretasi makna pengalaman hidup pendidik secara empatis dan komunikatif."
+            },
+            {
+                topic: "Teori Kekuasaan Michel Foucault",
+                topicTitle: "Power/Knowledge, Panopticon, & Disiplin Sekolah",
+                scenario: "Pemasangan kamera CCTV di setiap sudut kelas dan aplikasi absensi wajah berbasis lokasi digital meningkatkan tingkat kehadiran guru, namun menimbulkan rasa kecemasan dan pengawasan melekat.",
+                options: [
+                    { text: "Sistem pengawasan digital ini adalah manifested dari konsep 'Panopticon' Foucault, di mana individu mendisiplinkan diri karena merasa selalu diawasi.", correct: true },
+                    { text: "Foucault menegaskan bahwa Power/Knowledge (Relasi Kekuasaan-Pengetahuan) bekerja melalui instrumen administratif yang menentukan norma perilaku.", correct: true },
+                    { text: "Kekuasaan dalam pandangan Foucault bersifat absolut top-down dan tidak pernah menimbulkan bentuk resistensi mikro dari guru.", correct: false },
+                    { text: "Kepatuhan formalitas guru tanpa komitmen batiniah merupakan bentuk 'Counter-Conduct' (resistensi terselubung) terhadap sistem kontrol.", correct: true }
+                ],
+                explanation: "Foucault menjelaskan bahwa birokrasi modern memanfaatkan disiplin dan pengawasan (Panopticon) sebagai teknologi kekuasaan untuk membentuk kepatuhan."
+            },
+            {
+                topic: "Humanisme Eksistensialistik",
+                topicTitle: "Kebebasan Bertanggung Jawab SDM Pendidikan",
+                scenario: "Kepala sekolah memberikan otonomi penuh kepada para guru untuk merancang kurikulum dan metode pengajaran inovatif sesuai panggilan jiwa mereka, disertai tanggung jawab atas hasil perkembangan peserta didik.",
+                options: [
+                    { text: "Kebijakan ini selaras dengan prinsip Eksistensialisme (Sartre/Frankl): 'Existence Precedes Essence'—guru menemukan makna profesional lewat kebebasan memilih.", correct: true },
+                    { text: "Kebebasan eksistensial senantiasa menuntut Tanggung Jawab Otentik (Authentic Responsibility) atas konsekuensi dari keputusan yang diambil.", correct: true },
+                    { text: "Eksistensialisme memandang administrator sekolah bertugas menyeragamkan pikiran guru agar menjadi seperti mesin.", correct: false },
+                    { text: "Pendekatan ini meyakini bahwa dorongan kerja tertinggi pendidik berasal dari pencarian makna (Will to Meaning).", correct: true }
+                ],
+                explanation: "Eksistensialisme menekankan kebebasan individu untuk memilih perilakunya secara otentik yang diimbangi dengan tanggung jawab penuh atas pilihan tersebut."
+            },
+            {
+                topic: "Dialektika Hegelian-Marxian",
+                topicTitle: "Dinamika Perubahan & Reformasi Pendidikan",
+                scenario: "Pertentangan antara kebijakan efisiensi anggaran pemerintah (Tesis) dan tuntutan kesejahteraan serta keadilan guru (Antitesis) melahirkan sintesis baru berupa model Manajemen Berbasis Sekolah bermitra masyarakat yang akuntabel.",
+                options: [
+                    { text: "Dinamika ini mengikuti hukum Dialektika (Tesis - Antitesis - Sintesis) di mana kontradiksi internal mendorong kemajuan struktur organisasi.", correct: true },
+                    { text: "Analisis Kritik Marxian mengingatkan agar Sintesis baru tidak terjerat komodifikasi pendidikan yang merugikan pendidik.", correct: true },
+                    { text: "Dialektika meyakini bahwa organisasi pendidikan berkembang secara linier dan statis tanpa adanya pertentangan gagasan.", correct: false },
+                    { text: "Administrator yang melek dialektika memandang konflik organisasi sebagai katalisator transformasi evolusioner.", correct: true }
+                ],
+                explanation: "Dialektika mengajarkan bahwa perubahan dan perkembangan organisasi terjadi melalui pertentangan (kontradiksi) gagasan yang bermuara pada sintesis perbaikan."
+            },
+            {
+                topic: "Teleologi & Rekonstruksionisme Sosial",
+                topicTitle: "Arah Masa Depan Administrasi Pendidikan",
+                scenario: "Visi Administrasi Pendidikan Nasional 2045 dirancang bukan sekadar mencetak lulusan untuk kebutuhan industri (efisiensi ekonomi), melainkan membangun peradaban yang berkeadilan sosial, berwawasan lingkungan, dan responsif AI.",
+                options: [
+                    { text: "Arah Teleologis ini mencerminkan Rekonstruksionisme Sosial (Brameld) yang menempatkan sekolah sebagai agen utama perombakan tata sosial.", correct: true },
+                    { text: "Teleologi pendidikan menuntut transformasi dari sekadar Maintenance Management menjadi Transformative & Futurist Governance.", correct: true },
+                    { text: "Rekonstruksionisme Sosial menganggap tujuan akhir administrasi hanyalah melestarikan status quo birokrasi lama.", correct: false },
+                    { text: "Visi ini memadukan etika ekologis, humanisme digital, dan kemandirian bangsa sebagai puncak keunggulan filsafat administrasi.", correct: true }
+                ],
+                explanation: "Rekonstruksionisme Sosial dan Teleologi melihat administrasi pendidikan sebagai alat rekonstruksi peradaban menuju tata kehidupan masyarakat masa depan yang lebih adil."
+            }
+        ];
+
+        /* -------------------------------------------------------------------------- */
+        /* 2. AUDIO SYNTHESIZER ENGINE (WEB AUDIO API)                                */
+        /* -------------------------------------------------------------------------- */
+        let audioCtx = null;
+        let isAudioMuted = false;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSynthSound(type) {
+            if (isAudioMuted) return;
+            initAudio();
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'jump') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.exponentialRampToValueAtTime(450, now + 0.15);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
+                osc.start(now);
+                osc.stop(now + 0.15);
+            } else if (type === 'coin') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(987.77, now); // B5
+                osc.frequency.setValueAtTime(1318.51, now + 0.08); // E6
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+                osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+                osc.frequency.setValueAtTime(1046.50, now + 0.3); // C6
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, now);
+                osc.frequency.setValueAtTime(180, now + 0.15);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
+                osc.start(now);
+                osc.stop(now + 0.35);
+            } else if (type === 'win') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.setValueAtTime(554.37, now + 0.12);
+                osc.frequency.setValueAtTime(659.25, now + 0.24);
+                osc.frequency.setValueAtTime(880, now + 0.36);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.7);
+                osc.start(now);
+                osc.stop(now + 0.7);
+            }
+        }
+
+        function toggleAudio() {
+            isAudioMuted = !isAudioMuted;
+            const icon = document.getElementById('audioIcon');
+            if (isAudioMuted) {
+                icon.className = "fa-solid fa-volume-xmark text-red-500";
+            } else {
+                icon.className = "fa-solid fa-volume-high text-slate-800";
+                playSynthSound('coin');
+            }
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* 3. GAMEPLAY CANVAS ENGINE (MARIO PLATFORMER)                               */
+        /* -------------------------------------------------------------------------- */
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // State variables
+        let playerState = {
+            name: "Mahasiswa Magister",
+            nim: "2026-S2-FILSAFAT",
+            score: 0,
+            completedLevels: 0,
+            currentQuestionIdx: null
+        };
+
+        // World Parameters
+        const WORLD_WIDTH = 3200;
+        const GROUND_Y = 370;
+
+        // Player Mario Object
+        let mario = {
+            x: 50,
+            y: 200,
+            width: 36,
+            height: 48,
+            vx: 0,
+            vy: 0,
+            speed: 5,
+            jumpStrength: -12.5,
+            gravity: 0.55,
+            isGrounded: false,
+            facingRight: true,
+            frameTimer: 0
+        };
+
+        // Interactive Blocks & World Objects
+        let questionBlocks = [];
+        let backgroundHills = [];
+        let coins = [];
+        let pipes = [];
+
+        function initWorldObjects() {
+            questionBlocks = [];
+            coins = [];
+            pipes = [];
+            backgroundHills = [];
+
+            // Generate 10 Question Blocks spaced out across world
+            const startX = 250;
+            const stepX = 270;
+            for (let i = 0; i < 10; i++) {
+                questionBlocks.push({
+                    id: i,
+                    x: startX + (i * stepX),
+                    y: 240 - (i % 2 * 30),
+                    width: 40,
+                    height: 40,
+                    solved: false,
+                    bounce: 0
+                });
+            }
+
+            // Decorative Clay Pipes
+            for (let i = 0; i < 8; i++) {
+                pipes.push({
+                    x: 400 + i * 350,
+                    y: GROUND_Y - 50,
+                    width: 50,
+                    height: 50
+                });
+            }
+
+            // Decorative Floating Coins
+            for (let i = 0; i < 15; i++) {
+                coins.push({
+                    x: 180 + i * 180,
+                    y: 280 - (Math.sin(i) * 60),
+                    radius: 10,
+                    collected: false
+                });
+            }
+
+            // Clay Hills in Background
+            for (let i = 0; i < 10; i++) {
+                backgroundHills.push({
+                    x: i * 350 - 50,
+                    y: GROUND_Y,
+                    radius: 120 + (i % 3 * 30)
+                });
+            }
+        }
+
+        // Camera Offset
+        let cameraX = 0;
+
+        // Key Listeners
+        const keys = { left: false, right: false, up: false };
+
+        window.addEventListener('keydown', (e) => {
+            initAudio();
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = true;
+            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = true;
+            if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W' || e.key === ' ') {
+                keys.up = true;
+                jumpMario();
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = false;
+            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
+            if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W' || e.key === ' ') keys.up = false;
+        });
+
+        // Touch Control Listeners
+        const btnLeft = document.getElementById('btnLeft');
+        const btnRight = document.getElementById('btnRight');
+        const btnJump = document.getElementById('btnJump');
+
+        const bindTouch = (elem, keyProp) => {
+            elem.addEventListener('touchstart', (e) => { e.preventDefault(); initAudio(); keys[keyProp] = true; if(keyProp==='up') jumpMario(); });
+            elem.addEventListener('touchend', (e) => { e.preventDefault(); keys[keyProp] = false; });
+            elem.addEventListener('mousedown', () => { initAudio(); keys[keyProp] = true; if(keyProp==='up') jumpMario(); });
+            elem.addEventListener('mouseup', () => { keys[keyProp] = false; });
+        };
+        bindTouch(btnLeft, 'left');
+        bindTouch(btnRight, 'right');
+        bindTouch(btnJump, 'up');
+
+        function jumpMario() {
+            if (mario.isGrounded) {
+                mario.vy = mario.jumpStrength;
+                mario.isGrounded = false;
+                playSynthSound('jump');
+            }
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* 4. CANVAS RENDERING & DRAWING FUNCTIONS (3D CLAY CARTOON LOOK)             */
+        /* -------------------------------------------------------------------------- */
+
+        function drawClayHill(x, y, r) {
+            const screenX = x - cameraX;
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(screenX, y, r, Math.PI, 0, false);
+            const grad = ctx.createLinearGradient(screenX, y - r, screenX, y);
+            grad.addColorStop(0, '#52B788');
+            grad.addColorStop(1, '#2D6A4F');
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            // Inner Clay Highlight
+            ctx.beginPath();
+            ctx.arc(screenX - r*0.2, y - r*0.5, r*0.7, Math.PI*0.8, Math.PI*0.2, false);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+            ctx.lineWidth = 12;
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        function drawClayPipe(pipe) {
+            const screenX = pipe.x - cameraX;
+            if (screenX < -100 || screenX > canvas.width + 100) return;
+
+            ctx.save();
+            // Pipe Body Gradient
+            const grad = ctx.createLinearGradient(screenX, pipe.y, screenX + pipe.width, pipe.y);
+            grad.addColorStop(0, '#74C69D');
+            grad.addColorStop(0.3, '#40916C');
+            grad.addColorStop(0.8, '#1B4332');
+            grad.addColorStop(1, '#081C15');
+
+            // Draw Main Body
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.roundRect(screenX, pipe.y, pipe.width, pipe.height, 8);
+            ctx.fill();
+            ctx.strokeStyle = '#2D6A4F';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Pipe Top Rim
+            ctx.beginPath();
+            ctx.roundRect(screenX - 4, pipe.y - 15, pipe.width + 8, 18, 6);
+            ctx.fill();
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        function drawClayQuestionBlock(block) {
+            const screenX = block.x - cameraX;
+            if (screenX < -100 || screenX > canvas.width + 100) return;
+
+            ctx.save();
+            ctx.translate(screenX + block.width / 2, block.y + block.height / 2 - block.bounce);
+
+            // Shadow
+            ctx.shadowColor = 'rgba(0,0,0,0.2)';
+            ctx.shadowBlur = 8;
+            ctx.shadowOffsetY = 4;
+
+            // Block Color (Active Yellow / Solved Brown Clay)
+            if (!block.solved) {
+                const grad = ctx.createLinearGradient(-20, -20, 20, 20);
+                grad.addColorStop(0, '#FFE066');
+                grad.addColorStop(1, '#F59E0B');
+                ctx.fillStyle = grad;
+            } else {
+                ctx.fillStyle = '#B45309'; // Empty Clay block
+            }
+
+            // Draw Rounded Block
+            ctx.beginPath();
+            ctx.roundRect(-20, -20, 40, 40, 10);
+            ctx.fill();
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Question Mark Text or Solved Mark
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = 'bold 22px Fredoka, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            if (!block.solved) {
+                ctx.fillText('?', 0, 1);
+            } else {
+                ctx.fillText('✓', 0, 1);
+            }
+
+            // Corner Rivets (Clay Dots)
+            ctx.fillStyle = 'rgba(255,255,255,0.6)';
+            ctx.beginPath();
+            ctx.arc(-13, -13, 2.5, 0, Math.PI * 2);
+            ctx.arc(13, -13, 2.5, 0, Math.PI * 2);
+            ctx.arc(-13, 13, 2.5, 0, Math.PI * 2);
+            ctx.arc(13, 13, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function drawClayCoin(coin) {
+            if (coin.collected) return;
+            const screenX = coin.x - cameraX;
+            if (screenX < -50 || screenX > canvas.width + 50) return;
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(screenX, coin.y, coin.radius, 0, Math.PI * 2);
+            const grad = ctx.createRadialGradient(screenX - 3, coin.y - 3, 2, screenX, coin.y, coin.radius);
+            grad.addColorStop(0, '#FFF3B0');
+            grad.addColorStop(0.7, '#FFC300');
+            grad.addColorStop(1, '#FF8500');
+            ctx.fillStyle = grad;
+            ctx.fill();
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        function drawClayMario() {
+            const screenX = mario.x - cameraX;
+            ctx.save();
+            ctx.translate(screenX + mario.width / 2, mario.y + mario.height / 2);
+
+            if (!mario.facingRight) {
+                ctx.scale(-1, 1);
+            }
+
+            // Mario Body (3D Red Clay Overalls)
+            ctx.fillStyle = '#E63946'; // Red shirt
+            ctx.beginPath();
+            ctx.roundRect(-14, -12, 28, 22, 8);
+            ctx.fill();
+
+            // Blue Overalls
+            ctx.fillStyle = '#1D4ED8';
+            ctx.beginPath();
+            ctx.roundRect(-12, 2, 24, 18, 6);
+            ctx.fill();
+
+            // Clay Shoes
+            ctx.fillStyle = '#78350F';
+            ctx.beginPath();
+            ctx.roundRect(-15, 18, 12, 8, 4);
+            ctx.roundRect(3, 18, 12, 8, 4);
+            ctx.fill();
+
+            // Head (Sphere Clay)
+            ctx.fillStyle = '#FDBA74';
+            ctx.beginPath();
+            ctx.arc(0, -14, 13, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Eyes & Nose
+            ctx.fillStyle = '#1E293B';
+            ctx.beginPath();
+            ctx.arc(5, -16, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Big Clay Nose
+            ctx.fillStyle = '#F97316';
+            ctx.beginPath();
+            ctx.arc(7, -13, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Mario Red Graduation Cap / Mario Hat
+            ctx.fillStyle = '#DC2626';
+            ctx.beginPath();
+            ctx.arc(0, -22, 13, Math.PI, 0, false);
+            ctx.fill();
+            // Cap Visor
+            ctx.beginPath();
+            ctx.roundRect(-3, -23, 16, 5, 2);
+            ctx.fill();
+
+            // Graduation Tassel (Educational Touch!)
+            ctx.strokeStyle = '#FBBF24';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, -24);
+            ctx.lineTo(10, -18);
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        function drawFinishFlag() {
+            const finishX = WORLD_WIDTH - 150;
+            const screenX = finishX - cameraX;
+            if (screenX < -100 || screenX > canvas.width + 100) return;
+
+            ctx.save();
+            // Pole
+            ctx.fillStyle = '#94A3B8';
+            ctx.fillRect(screenX, GROUND_Y - 200, 10, 200);
+
+            // Gold Top Ball
+            ctx.fillStyle = '#F59E0B';
+            ctx.beginPath();
+            ctx.arc(screenX + 5, GROUND_Y - 205, 12, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Flag
+            ctx.fillStyle = '#10B981';
+            ctx.beginPath();
+            ctx.moveTo(screenX + 10, GROUND_Y - 195);
+            ctx.lineTo(screenX + 70, GROUND_Y - 170);
+            ctx.lineTo(screenX + 10, GROUND_Y - 145);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = 'bold 12px Fredoka';
+            ctx.fillText('FINISH', screenX + 15, GROUND_Y - 165);
+
+            ctx.restore();
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* 5. GAME LOOP & PHYSICS UPDATE                                             */
+        /* -------------------------------------------------------------------------- */
+
+        function updatePhysics() {
+            // Horizontal Movement
+            if (keys.left) {
+                mario.vx = -mario.speed;
+                mario.facingRight = false;
+            } else if (keys.right) {
+                mario.vx = mario.speed;
+                mario.facingRight = true;
+            } else {
+                mario.vx *= 0.7; // Friction
+            }
+
+            mario.x += mario.vx;
+
+            // Gravity & Vertical Movement
+            mario.vy += mario.gravity;
+            mario.y += mario.vy;
+
+            // Ground Collision
+            if (mario.y + mario.height >= GROUND_Y) {
+                mario.y = GROUND_Y - mario.height;
+                mario.vy = 0;
+                mario.isGrounded = true;
+            }
+
+            // Boundaries
+            if (mario.x < 0) mario.x = 0;
+            if (mario.x > WORLD_WIDTH - mario.width) mario.x = WORLD_WIDTH - mario.width;
+
+            // Camera follow Mario
+            cameraX = mario.x - canvas.width / 3;
+            if (cameraX < 0) cameraX = 0;
+            if (cameraX > WORLD_WIDTH - canvas.width) cameraX = WORLD_WIDTH - canvas.width;
+
+            // Coin Collection Collision
+            coins.forEach(coin => {
+                if (!coin.collected) {
+                    const dist = Math.hypot((mario.x + mario.width/2) - coin.x, (mario.y + mario.height/2) - coin.y);
+                    if (dist < coin.radius + 20) {
+                        coin.collected = true;
+                        playerState.score += 5;
+                        updateScoreDisplay();
+                        playSynthSound('coin');
+                    }
+                }
+            });
+
+            // Question Block Collision (Jump from below)
+            questionBlocks.forEach(block => {
+                // Check Mario Head Collision with bottom of block
+                if (mario.x + mario.width > block.x &&
+                    mario.x < block.x + block.width &&
+                    mario.y <= block.y + block.height &&
+                    mario.y >= block.y &&
+                    mario.vy < 0) {
+                    
+                    mario.vy = 2; // Bounce back down
+                    if (!block.solved) {
+                        block.bounce = 12;
+                        setTimeout(() => block.bounce = 0, 150);
+                        openQuizModal(block.id);
+                    }
+                }
+            });
+
+            // Finish Line Detection
+            const finishX = WORLD_WIDTH - 150;
+            if (mario.x >= finishX - 20) {
+                endGame();
+            }
+        }
+
+        function renderGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Rolling Clay Hills Background
+            backgroundHills.forEach(hill => drawClayHill(hill.x, hill.y, hill.radius));
+
+            // Draw Clay Ground
+            ctx.fillStyle = '#D97706'; // Terracotta clay color
+            ctx.fillRect(0, GROUND_Y, canvas.width, canvas.height - GROUND_Y);
+
+            // Ground Top Border Line
+            ctx.fillStyle = '#65A30D'; // Green grass top line
+            ctx.fillRect(0, GROUND_Y, canvas.width, 14);
+
+            // Draw World Objects
+            pipes.forEach(drawClayPipe);
+            coins.forEach(drawClayCoin);
+            questionBlocks.forEach(drawClayQuestionBlock);
+            drawFinishFlag();
+
+            // Draw Player
+            drawClayMario();
+        }
+
+        let animationFrameId = null;
+        function gameLoop() {
+            updatePhysics();
+            renderGame();
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* 6. UI & KUIS HOTS CONTROLLER                                               */
+        /* -------------------------------------------------------------------------- */
+
+        function startGame() {
+            initAudio();
+            const name = document.getElementById('playerNameInput').value.trim();
+            const nim = document.getElementById('playerNimInput').value.trim();
+
+            if (name) playerState.name = name;
+            if (nim) playerState.nim = nim;
+
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            document.getElementById('gameScreen').classList.add('flex');
+
+            initWorldObjects();
+            mario.x = 50;
+            mario.y = 200;
+            playerState.score = 0;
+            playerState.completedLevels = 0;
+            updateScoreDisplay();
+
+            if (!animationFrameId) {
+                gameLoop();
+            }
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('displayScore').innerText = playerState.score;
+            document.getElementById('displayProgress').innerText = `${playerState.completedLevels}/10`;
+        }
+
+        function openQuizModal(questionIdx) {
+            playerState.currentQuestionIdx = questionIdx;
+            const q = quizData[questionIdx];
+
+            document.getElementById('modalTopicBadge').innerText = `Dunia ${questionIdx + 1}`;
+            document.getElementById('modalTopicTitle').innerText = q.topic;
+            document.getElementById('modalScenarioText').innerText = q.scenario;
+
+            // Render Complex Multiple Choice Options (Checkboxes)
+            const container = document.getElementById('modalOptionsContainer');
+            container.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const optElement = document.createElement('label');
+                optElement.className = "flex items-start gap-3 p-3 rounded-2xl border-2 border-slate-200 hover:border-blue-400 bg-white cursor-pointer transition-all";
+                optElement.innerHTML = `
+                    <input type="checkbox" data-idx="${idx}" class="mt-1 w-5 h-5 rounded-lg text-blue-600 focus:ring-blue-400 cursor-pointer">
+                    <span class="text-xs md:text-sm text-slate-700 font-medium leading-relaxed">${opt.text}</span>
+                `;
+                container.appendChild(optElement);
+            });
+
+            // Reset Feedback Box
+            document.getElementById('quizFeedbackBox').classList.add('hidden');
+            document.getElementById('btnSubmitAnswer').classList.remove('hidden');
+            document.getElementById('btnContinueGame').classList.add('hidden');
+
+            document.getElementById('quizModal').classList.remove('hidden');
+            playSynthSound('coin');
+        }
+
+        function submitAnswer() {
+            const qIdx = playerState.currentQuestionIdx;
+            const q = quizData[qIdx];
+            const checkboxes = document.querySelectorAll('#modalOptionsContainer input[type="checkbox"]');
+
+            let allCorrect = true;
+            let selectedAny = false;
+
+            checkboxes.forEach((cb, idx) => {
+                const isChecked = cb.checked;
+                const shouldBeChecked = q.options[idx].correct;
+                if (isChecked) selectedAny = true;
+
+                if (isChecked !== shouldBeChecked) {
+                    allCorrect = false;
+                }
+            });
+
+            if (!selectedAny) {
+                alert("Pilihlah setidaknya satu jawaban yang Anda anggap benar!");
+                return;
+            }
+
+            const feedbackBox = document.getElementById('quizFeedbackBox');
+            const feedbackTitle = document.getElementById('feedbackTitle');
+            const feedbackText = document.getElementById('feedbackText');
+
+            feedbackBox.classList.remove('hidden');
+
+            if (allCorrect) {
+                playerState.score += 10;
+                playerState.completedLevels += 1;
+                questionBlocks[qIdx].solved = true;
+                updateScoreDisplay();
+
+                feedbackBox.className = "rounded-2xl p-4 mb-4 text-xs md:text-sm leading-relaxed border-2 bg-green-50 border-green-300 text-green-900";
+                feedbackTitle.innerText = " Sempurna! Analisis Filosofis Tepat (+10 Poin)";
+                feedbackText.innerText = q.explanation;
+                playSynthSound('correct');
+            } else {
+                playerState.completedLevels += 1;
+                questionBlocks[qIdx].solved = true;
+                updateScoreDisplay();
+
+                feedbackBox.className = "rounded-2xl p-4 mb-4 text-xs md:text-sm leading-relaxed border-2 bg-amber-50 border-amber-300 text-amber-900";
+                feedbackTitle.innerText = " Kurang Tepat / Belum Lengkap";
+                feedbackText.innerText = `Pembahasan Filosofis: ${q.explanation}`;
+                playSynthSound('wrong');
+            }
+
+            // Disable checkboxes after submission
+            checkboxes.forEach(cb => cb.disabled = true);
+
+            document.getElementById('btnSubmitAnswer').classList.add('hidden');
+            document.getElementById('btnContinueGame').classList.remove('hidden');
+        }
+
+        function closeQuizModal() {
+            document.getElementById('quizModal').classList.add('hidden');
+        }
+
+        function endGame() {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.remove('hidden');
+
+            document.getElementById('resName').innerText = playerState.name;
+            document.getElementById('resNim').innerText = playerState.nim;
+            document.getElementById('resScore').innerText = `${playerState.score} / 100`;
+
+            let predicate = "";
+            let evaluation = "";
+
+            if (playerState.score >= 80) {
+                predicate = " Master Philosopher Admin (Magister Utama)";
+                evaluation = "Selamat! Anda memiliki penguasaan mendalam atas ontologi, epistemologi, etika aksiologis, serta teori kritis Foucault/Habermas dalam ranah Administrasi Pendidikan S2. Anda siap menjadi pengambil kebijakan strategis yang transformatif.";
+            } else if (playerState.score >= 50) {
+                predicate = " Critical Admin Specialist (Magister Madya)";
+                evaluation = "Pemahaman filsafat administrasi Anda sudah baik secara konseptual. Tingkatkan lagi refleksi atas dekonstruksi birokrasi, fenomologi supervisi, dan pragmatisme pendidikan dalam pemecahan kasus nyata.";
+            } else {
+                predicate = " Learner of Educational Philosophy (Magister Muda)";
+                evaluation = "Anda telah menyelesaikan petualangan ini! Disarankan untuk memperdalam lagi literatur dasar Ontologi, Aksiologi Kantian, serta Rekonstruksionisme Sosial untuk mengokohkan fondasi berpikir tingkat tinggi (HOTS).";
+            }
+
+            document.getElementById('resPredicate').innerText = predicate;
+            document.getElementById('resEvaluation').innerText = evaluation;
+
+            playSynthSound('win');
+        }
+
+        function restartGame() {
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('startScreen').classList.remove('hidden');
+        }
+
+        function openInstructionsModal() {
+            document.getElementById('instructionsModal').classList.remove('hidden');
+        }
+
+        function closeInstructionsModal() {
+            document.getElementById('instructionsModal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
